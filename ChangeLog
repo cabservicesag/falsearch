@@ -1,0 +1,25 @@
+2015-04-14 Nils Blattner <nb@cabag.ch>
+	* version 0.0.6
+	* [TASK] changed name from t3filelist62 to falsearch
+	* [TASK] added GPLv2
+	* [TASK] uploaded to github.com
+
+2015-04-02 Nils Blattner <nb@cabag.ch>
+	* version 0.0.5
+	* [BUG] fixed it so the recursed paths are rawurldecoded and htmlspecialchars'd
+
+2015-04-02 Nils Blattner <nb@cabag.ch>
+	* version 0.0.4
+	* [FEATURE] added recursion and fixed some issues with ElementBrowser
+
+2015-03-19 Nils Blattner <nb@cabag.ch>
+	* version 0.0.3
+	* [BUG] fixed an issue because the FileList.php wrapped the input fields in a <form> tag
+
+2015-03-13 Nils Blattner <nb@cabag.ch>
+	* version 0.0.2
+	* added browselinks and element browser xclasses to filter in the file dialog
+
+2015-03-03 Nils Blattner <nb@cabag.ch>
+	* version 0.0.1
+	* initial version
