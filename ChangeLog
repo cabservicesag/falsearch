@@ -1,3 +1,7 @@
+2015-05-18 Nils Blattner <nb@cabag.ch>
+	* version 0.0.7
+	* [BUG] fixed an issue where it would not work properly in header_link fields
+
 2015-04-14 Nils Blattner <nb@cabag.ch>
 	* version 0.0.6
 	* [TASK] changed name from t3filelist62 to falsearch

@@ -39,12 +39,53 @@ class ElementBrowser extends \TYPO3\CMS\Recordlist\Browser\ElementBrowser {
 	 * @todo Define visibility
 	 */
 	public function TBE_expandFolder(Folder $folder, $extensionList = '', $noThumbs = FALSE) {
+		$content = $this->generateSearchFormAndInitializeFilter($folder);
+		
+		$content .= parent::TBE_expandFolder($folder, $extensionList, $noThumbs);
+		
+		return $content;
+	}
+
+	/**
+	 * For TYPO3 Element Browser: Expand folder of files.
+	 *
+	 * @param Folder $folder The folder path to expand
+	 * @param string $extensionList List of fileextensions to show
+	 * @param boolean $noThumbs Whether to show thumbnails or not. If set, no thumbnails are shown.
+	 * @return string HTML output
+	 * @todo Define visibility
+	 */
+	public function expandFolder(Folder $folder, $extensionList = '') {
+		$content = $this->generateSearchFormAndInitializeFilter($folder, false);
+		
+		$content .= parent::expandFolder($folder, $extensionList);
+		
+		return $content;
+	}
+	
+	/**
+	 * Generate the search form and initalize the filters.
+	 *
+	 * @param Folder $folder The folder path to search in.
+	 * @return string The form.
+	 */
+	protected function generateSearchFormAndInitializeFilter(Folder $folder, $tbe = true) {
 		$searchWord = trim(GeneralUtility::_GP('searchWord'));
 		
 		$content = '<form action="' . $this->getThisScript() . 'act=' . $this->act . '&mode=' . $this->mode
 			. '&expandFolder=' . rawurlencode($folder->getCombinedIdentifier())
 			. '&bparams=' . rawurlencode($this->bparams) . '" method="post" name="dblistForm">';
 		$content .= '<input type="text" name="searchWord" value="' . $searchWord . '" /><input type="submit" value="' . $GLOBALS['LANG']->sL('LLL:EXT:falsearch/Resources/Private/Language/locallang.xlf:search') . '" />';
+		
+		if (!$tbe) {
+			$P = GeneralUtility::_GP('P');
+			if (is_array($P)) {
+				foreach ($P as $key => $value) {
+					$content .= '<input type="hidden" name="P[' . htmlspecialchars($key) . ']" value="' . htmlspecialchars($value) . '" />';
+				}
+			}
+		}
+		
 		$content .= '<input type="hidden" name="cmd" /></form>';
 		
 		if (!empty($searchWord)) {
@@ -53,8 +94,6 @@ class ElementBrowser extends \TYPO3\CMS\Recordlist\Browser\ElementBrowser {
 			$folder->getStorage()->addFileAndFolderNameFilter(array($this, 'filterFiles'));
 			$folder->setOverrideRecursion(true);
 		}
-		
-		$content .= parent::TBE_expandFolder($folder, $extensionList, $noThumbs);
 		
 		return $content;
 	}
