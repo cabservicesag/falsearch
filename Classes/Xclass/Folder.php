@@ -14,6 +14,8 @@ namespace Cabag\Falsearch\Xclass;
  * The TYPO3 project - inspiring people to share!
  */
 
+use \TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * A folder that groups files in a storage. This may be a folder on the local
  * disk, a bucket in Amazon S3 or a user or a tag in Flickr.
@@ -35,6 +37,18 @@ class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 	 * @var boolean
 	 */
 	protected $overrideRecursion = false;
+	
+	/**
+	 * The search words.
+	 * @var string
+	 */
+	protected $searchWords = '';
+	
+	/**
+	 * The search category.
+	 * @var integer
+	 */
+	protected $searchCategory = 0;
 
 	/**
 	 * Returns whether the recursion should be overwritten to true.
@@ -55,6 +69,42 @@ class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 	}
 
 	/**
+	 * Returns the search words.
+	 *
+	 * @return string
+	 */
+	public function getSearchWords() {
+		return $this->searchWords;
+	}
+
+	/**
+	 * Sets the search words.
+	 *
+	 * @param string $searchWords The search words.
+	 */
+	public function setSearchWords($searchWords) {
+		$this->searchWords = trim($searchWords);
+	}
+
+	/**
+	 * Returns the search category.
+	 *
+	 * @return integer
+	 */
+	public function getSearchCategory() {
+		return $this->searchCategory;
+	}
+
+	/**
+	 * Sets the search category.
+	 *
+	 * @param integer $searchCategory The search category.
+	 */
+	public function setSearchCategory($searchCategory) {
+		$this->searchCategory = intval($searchCategory);
+	}
+
+	/**
 	 * Returns a list of files in this folder, optionally filtered. There are several filter modes available, see the
 	 * FILTER_MODE_* constants for more information.
 	 *
@@ -70,13 +120,89 @@ class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 		if ($this->overrideRecursion) {
 			$files = array();
 			
-			foreach (parent::getFiles($start, $numberOfItems, $filterMode, true) as $file) {
-				if (!($file instanceof \TYPO3\CMS\Core\Resource\ProcessedFile)) {
-					$files[] = $file;
+			$resourceFactory = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\ResourceFactory');
+			$driver = $resourceFactory->getDriverObject($this->getStorage()->getDriverType(), $this->getStorage()->getConfiguration());
+			
+			// Fallback for compatibility with the old method signature variable $useFilters that was used instead of $filterMode
+			if ($filterMode === FALSE) {
+				$useFilters = FALSE;
+				$filters = array();
+			} else {
+				$useFilters = TRUE;
+				$filters = $this->storage->getFileAndFolderNameFilters();
+				foreach ($this->fileAndFolderNameFilters as $filter) {
+					$filters[] = $filter;
 				}
 			}
+			
+			$words = $GLOBALS['TYPO3_DB']->fullQuoteArray(array_map(function ($value) { return '%' . $value . '%'; }, GeneralUtility::trimExplode(' ', $this->searchWords, true)), 'sys_file');
+			$wordsMatch = '';
+			if (count($words)) {
+				$wordsMatch = ' AND (sys_file.name LIKE ' . implode(' AND sys_file.name LIKE ', $words) . ')';
+			}
+			
+			$categoryUtility = GeneralUtility::makeInstance('Cabag\\Falsearch\\Utility\\CategoryUtility');
+			$categories = array();
+			if ($this->searchCategory > 0) {
+				$categories = array_keys($categoryUtility->getIndexForCategory($this->searchCategory));
+			}
+			
+			$resource = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+				'sys_file.*',
+				'sys_file' . (count($categories) > 0 ? ' LEFT JOIN sys_file_metadata ON sys_file_metadata.file = sys_file.uid LEFT JOIN sys_category_record_mm ON sys_file_metadata.uid = sys_category_record_mm.uid_foreign' : ''),
+				'sys_file.missing = 0 AND sys_file.storage = ' . $this->getStorage()->getUid() . ' AND sys_file.identifier LIKE ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($this->getIdentifier() . '%', 'sys_file') . $wordsMatch . (count($categories) > 0 ? ' AND sys_category_record_mm.tablenames = \'sys_file_metadata\' AND sys_category_record_mm.fieldname = \'categories\' AND sys_category_record_mm.uid_local IN (' . implode(',', $categories) . ')' : ''),
+				(count($categories) > 0 ? 'sys_file.uid' : ''),
+				'sys_file.identifier ASC'
+			);
+			
+			$count = 0;
+			$resultCount = 0;
+			while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($resource)) {
+				$ok = $useFilters && $this->applyFilterMethodsToDirectoryItem($filters, $row['name'], $row['identifier'], $driver);
+				if (!$ok) {
+					$badFilters++;
+					continue;
+				}
+				
+				if ($start <= $count) {
+					if ($numberOfItems !== 0 && $numberOfItems >= $resultCount) {
+						break;
+					}
+					$resultCount++;
+					$files[] = $resourceFactory->getFileObject($row['uid'], $row);
+				}
+				$count++;
+			}
+			
 			return $files;
 		}
 		return parent::getFiles($start, $numberOfItems, $filterMode, $recursive);
+	}
+
+	/**
+	 * Applies a set of filter methods to a file name to find out if it should be used or not. This is e.g. used by
+	 * directory listings.
+	 *
+	 * @param array $filterMethods The filter methods to use
+	 * @param string $itemName
+	 * @param string $itemIdentifier
+	 * @param string $parentIdentifier
+	 * @throws \RuntimeException
+	 * @return boolean
+	 */
+	protected function applyFilterMethodsToDirectoryItem(array $filterMethods, $itemName, $itemIdentifier, $driver) {
+		foreach ($filterMethods as $filter) {
+			if (is_array($filter)) {
+				$result = call_user_func($filter, $itemName, $itemIdentifier, \TYPO3\CMS\Core\Utility\PathUtility::dirname($identifier) . '/', array(), $driver);
+				// We have to use -1 as the „don't include“ return value, as call_user_func() will return FALSE
+				// If calling the method succeeded and thus we can't use that as a return value.
+				if ($result === -1) {
+					return FALSE;
+				} elseif ($result === FALSE) {
+					continue;
+				}
+			}
+		}
+		return TRUE;
 	}
 }

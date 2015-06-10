@@ -23,11 +23,6 @@ use TYPO3\CMS\Backend\Utility\IconUtility;
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
 class BrowseLinks extends \TYPO3\CMS\Rtehtmlarea\BrowseLinks {
-	/**
-	 * The search words (AND'd).
-	 * @var array
-	 */
-	protected $searchWords = array();
 
 	/**
 	 * For RTE: This displays all files from folder. No thumbnails shown
@@ -39,20 +34,28 @@ class BrowseLinks extends \TYPO3\CMS\Rtehtmlarea\BrowseLinks {
 	 */
 	public function expandFolder(Folder $folder, $extensionList = '') {
 		/* MODIFIED nb@cabag.ch start */
+		$categoryUtility = GeneralUtility::makeInstance('Cabag\\Falsearch\\Utility\\CategoryUtility');
+		
+		$searchCategory = intval(GeneralUtility::_GP('searchCategory'));
 		$searchWord = trim(GeneralUtility::_GP('searchWord'));
 		
 		$out = '<form action="' . $this->getThisScript() . 'act=' . $this->act . '&mode=' . $this->mode
 			. '&expandFolder=' . rawurlencode($folder->getCombinedIdentifier())
 			. '&bparams=' . rawurlencode($this->bparams) . '" method="post" name="dblistForm">';
-		$out .= '<input type="text" name="searchWord" value="' . $searchWord . '" /><input type="submit" value="' . $GLOBALS['LANG']->sL('LLL:EXT:falsearch/Resources/Private/Language/locallang.xlf:search') . '" />';
+		$out .= '<input type="text" name="searchWord" value="' . $searchWord . '" />';
+		
+		$out .= $categoryUtility->getCategorySelect(array('name' => 'searchCategory'), $searchCategory);
+		$out .= '<input type="submit" value="' . $GLOBALS['LANG']->sL('LLL:EXT:falsearch/Resources/Private/Language/locallang.xlf:search') . '" />';
 		$out .= '<input type="hidden" name="cmd" /></form>';
 		
-		if (!empty($searchWord)) {
-			$this->searchWords = GeneralUtility::trimExplode(' ', $searchWord);
+		if (!empty($searchWord) || $searchCategory > 0) {
+			$folder->setSearchWords($searchWord);
+			$folder->setSearchCategory($searchCategory);
 			
-			$folder->getStorage()->addFileAndFolderNameFilter(array($this, 'filterFiles'));
 			$folder->setOverrideRecursion(true);
+			$this->filteringRecursive = true;
 		}
+		
 		/* MODIFIED nb@cabag.ch end */
 		$renderFolders = $this->act === 'folder';
 		if ($folder->checkActionPermission('read')) {
@@ -125,7 +128,7 @@ class BrowseLinks extends \TYPO3\CMS\Rtehtmlarea\BrowseLinks {
 					'<a href="#" onclick="return link_folder(\'' . $itemUid . '\');">' .
 						$icon .
 						/* MODIFIED nb@cabag.ch start */
-						(count($this->searchWords) > 0 ? htmlspecialchars(rawurldecode(substr($fileOrFolderObject->getParentFolder()->getPublicUrl(), strlen($folder->getPublicUrl())))) : '') .
+						($folder->getOverrideRecursion() ? htmlspecialchars(rawurldecode(substr($fileOrFolderObject->getParentFolder()->getPublicUrl(), strlen($folder->getPublicUrl())))) : '') .
 						/* MODIFIED nb@cabag.ch end */
 						htmlspecialchars(GeneralUtility::fixed_lgd_cs($fileOrFolderObject->getName(), $titleLen)) .
 					'</a><br />';
@@ -146,33 +149,10 @@ class BrowseLinks extends \TYPO3\CMS\Rtehtmlarea\BrowseLinks {
 		//debug($this->folderObject->getPublicUrl(), $fileObject->getPublicUrl());
 		$code = parent::linkWrapFile($code, $fileObject);
 		
-		if (count($this->searchWords) > 0) {
+		if ($this->folderObject->getOverrideRecursion()) {
 			$code = substr($fileObject->getParentFolder()->getPublicUrl(), strlen($this->folderObject->getPublicUrl())) . $code;
 		}
 		
 		return $code;
-	}
-	
-	/**
-	 * Filter the given files/folders.
-	 *
-	 * @param string $itemName The name.
-	 * @param string $itemIdentifier The identifier.
-	 * @param string $parentIdentifier The parent identifier.
-	 * @param array $ignored Ignored array.
-	 * @param \TYPO3\CMS\Core\Resource\Driver\DriverInterface $driver The driver object.
-	 * @return mixed TRUE if the item should be displayed, -1 otherwise.
-	 */
-	public function filterFiles($itemName, $itemIdentifier, $parentIdentifier, array $ignored = array(), \TYPO3\CMS\Core\Resource\Driver\DriverInterface $driver) {
-		$result = TRUE;
-		
-		foreach ($this->searchWords as $word) {
-			if (stripos($itemName, $word) === FALSE) {
-				$result = -1;
-				break;
-			}
-		}
-		
-		return $result;
 	}
 }

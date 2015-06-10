@@ -1,3 +1,8 @@
+2015-06-10 Nils Blattner <nb@cabag.ch>
+	* version 0.0.8
+	* [FEATURE] refactored to search categories aswell
+	* [FEATURE] refactored to search directly in the database
+
 2015-05-18 Nils Blattner <nb@cabag.ch>
 	* version 0.0.7
 	* [BUG] fixed an issue where it would not work properly in header_link fields

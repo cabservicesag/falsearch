@@ -6,6 +6,9 @@
 			<trans-unit id="search" xml:space="preserve">
 				<source>Search</source>
 			</trans-unit>
+			<trans-unit id="allCategories" xml:space="preserve">
+				<source>All categories</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

@@ -22,11 +22,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
 class FileList extends \TYPO3\CMS\Filelist\FileList {
-	/**
-	 * The search words (AND'd).
-	 * @var array
-	 */
-	protected $searchWords = array();
 
 	/**
 	 * Returns a table with directories and files listed.
@@ -36,20 +31,23 @@ class FileList extends \TYPO3\CMS\Filelist\FileList {
 	 * @todo Define visibility
 	 */
 	public function getTable($rowlist) {
+		$categoryUtility = GeneralUtility::makeInstance('Cabag\\Falsearch\\Utility\\CategoryUtility');
+		
+		$searchCategory = intval(GeneralUtility::_GP('searchCategory'));
 		$searchWord = trim(GeneralUtility::_GP('searchWord'));
-		$backupFilters = $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['defaultFilterCallbacks'];
 		
-		$content .= '<input type="text" name="searchWord" value="' . $searchWord . '" /><input type="submit" value="' . $GLOBALS['LANG']->sL('LLL:EXT:falsearch/Resources/Private/Language/locallang.xlf:search') . '" />';
+		$content .= '<input type="text" name="searchWord" value="' . $searchWord . '" />';
+		$content .= $categoryUtility->getCategorySelect(array('name' => 'searchCategory'), $searchCategory);
+		$content .= '<input type="submit" value="' . $GLOBALS['LANG']->sL('LLL:EXT:falsearch/Resources/Private/Language/locallang.xlf:search') . '" />';
 		
-		if (!empty($searchWord)) {
-			$this->searchWords = GeneralUtility::trimExplode(' ', $searchWord);
+		if (!empty($searchWord) || $searchCategory > 0) {
+			$this->folderObject->setSearchWords($searchWord);
+			$this->folderObject->setSearchCategory($searchCategory);
 			
-			$GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['defaultFilterCallbacks'][] = array($this, 'filterFiles');
 			$this->folderObject->setOverrideRecursion(true);
 		}
 		
 		$content .= parent::getTable($rowlist);
-		$GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['defaultFilterCallbacks'] = $backupFilters;
 		
 		return $content;
 	}
@@ -65,33 +63,10 @@ class FileList extends \TYPO3\CMS\Filelist\FileList {
 	public function linkWrapFile($code, \TYPO3\CMS\Core\Resource\File $fileObject) {
 		$code = parent::linkWrapFile($code, $fileObject);
 		
-		if (count($this->searchWords) > 0) {
+		if ($this->folderObject->getOverrideRecursion()) {
 			$code = htmlspecialchars(rawurldecode(substr($fileObject->getParentFolder()->getPublicUrl(), strlen($this->folderObject->getPublicUrl())))) . $code;
 		}
 		
 		return $code;
-	}
-	
-	/**
-	 * Filter the given files/folders.
-	 *
-	 * @param string $itemName The name.
-	 * @param string $itemIdentifier The identifier.
-	 * @param string $parentIdentifier The parent identifier.
-	 * @param array $ignored Ignored array.
-	 * @param \TYPO3\CMS\Core\Resource\Driver\DriverInterface $driver The driver object.
-	 * @return mixed TRUE if the item should be displayed, -1 otherwise.
-	 */
-	public function filterFiles($itemName, $itemIdentifier, $parentIdentifier, array $ignored = array(), \TYPO3\CMS\Core\Resource\Driver\DriverInterface $driver) {
-		$result = TRUE;
-		
-		foreach ($this->searchWords as $word) {
-			if (stripos($itemName, $word) === FALSE) {
-				$result = -1;
-				break;
-			}
-		}
-		
-		return $result;
 	}
 }
