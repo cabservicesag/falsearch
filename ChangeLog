@@ -1,3 +1,7 @@
+2015-06-15 Nils Blattner <nb@cabag.ch>
+	* version 0.0.9
+	* [FEATURE] fixed core issue, where sys_refindex contains the full path instead of a reference to sys_file uid
+
 2015-06-10 Nils Blattner <nb@cabag.ch>
 	* version 0.0.8
 	* [FEATURE] refactored to search categories aswell
