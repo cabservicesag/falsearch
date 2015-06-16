@@ -86,4 +86,19 @@ class FileList extends \TYPO3\CMS\Filelist\FileList {
 		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('DISTINCT *', 'sys_refindex', '((ref_table=\'sys_file\' AND ref_uid = ' . (int)$fileOrFolderObject->getUid() . ') OR ref_table = \'_FILE\' AND ref_string = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr(rawurldecode($fileOrFolderObject->getPublicURL()), 'sys_refindex') . ') AND deleted=0 AND tablename != "sys_file_metadata"');
 		return $this->generateReferenceToolTip($rows, '\'_FILE\', ' . GeneralUtility::quoteJSvalue($fileOrFolderObject->getCombinedIdentifier()));
 	}
+
+	/**
+	 * Do not show folders when searching.
+	 *
+	 * @param \TYPO3\CMS\Core\Resource\Folder[] $folders Folders of \TYPO3\CMS\Core\Resource\Folder
+	 * @return string HTML table rows.
+	 * @todo Define visibility
+	 */
+	public function formatDirList(array $folders) {
+		if ($this->folderObject->getOverrideRecursion()) {
+			return '';
+		}
+		
+		return parent::formatDirList($folders);
+	}
 }

@@ -1,4 +1,9 @@
 2015-06-16 Nils Blattner <nb@cabag.ch>
+	* version 0.1.1
+	* [FEATURE] changed it so that the folders are not displayed in the filelist module when searching
+	* [BUG] fixed an issue when files are missing in the file system but still indexed
+
+2015-06-16 Nils Blattner <nb@cabag.ch>
 	* version 0.1.0
 	* [FEATURE] changed it so the show_item.php script also shows legacy sys_refindex
 	* [TASK] cleaned up PHDoc for several classes

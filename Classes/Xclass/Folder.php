@@ -145,6 +145,7 @@ class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 				'sys_file.identifier ASC'
 			);
 			
+			$indexer = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Index\\Indexer', $this->getStorage());
 			$count = 0;
 			$resultCount = 0;
 			while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($resource)) {
@@ -158,8 +159,22 @@ class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 					if ($numberOfItems !== 0 && $numberOfItems >= $resultCount) {
 						break;
 					}
+					$file = $resourceFactory->getFileObject($row['uid'], $row);
+					
+					// make sure the missing information is up to date
+					try {
+						$indexer->updateIndexEntry($file);
+					} catch (\Exception $e) {
+						// file missing
+						$file->setMissing(true);
+						\TYPO3\CMS\Core\Resource\Index\FileIndexRepository::getInstance()->markFileAsMissing($file->getUid());
+					}
+					if ($file->isMissing()) {
+						continue;
+					}
+					
+					$files[] = $file;
 					$resultCount++;
-					$files[] = $resourceFactory->getFileObject($row['uid'], $row);
 				}
 				$count++;
 			}
