@@ -18,3 +18,5 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Rtehtmlarea\\BrowseLi
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Core\\Resource\\Folder'] = array(
 	'className' => 'Cabag\\Falsearch\\Xclass\\Folder'
 );
+
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/show_item.php']['typeRendering'][] = 'EXT:falsearch/Classes/Controller/ElementInformationController.php:Cabag\\Falsearch\\Controller\\ElementInformationController';

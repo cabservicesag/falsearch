@@ -17,19 +17,9 @@ namespace Cabag\Falsearch\Xclass;
 use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * A folder that groups files in a storage. This may be a folder on the local
- * disk, a bucket in Amazon S3 or a user or a tag in Flickr.
+ * A folder that allows searching by name and category.
  *
- * This object is not persisted in TYPO3 locally, but created on the fly by
- * storage drivers for the folders they "offer".
- *
- * Some folders serve as a physical container for files (e.g. folders on the
- * local disk, S3 buckets or Flickr users). Other folders just group files by a
- * certain criterion, e.g. a tag.
- * The way this is implemented depends on the storage driver.
- *
- * @author Andreas Wolf <andreas.wolf@ikt-werk.de>
- * @author Ingmar Schlecht <ingmar@typo3.org>
+ * @author Nils Blattner <nb@cabag.ch>
  */
 class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 	/**

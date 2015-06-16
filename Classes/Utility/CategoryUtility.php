@@ -18,9 +18,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Backend\Utility\IconUtility;
 
 /**
- * Class for rendering of File>Filelist
+ * Utility class to help with search by the categories.
  *
- * @author Kasper Skårhøj <kasperYYYY@typo3.com>
+ * @author Nils Blattner <nb@cabag.ch>
  */
 class CategoryUtility implements \TYPO3\CMS\Core\SingletonInterface {
 	/**

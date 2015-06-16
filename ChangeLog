@@ -1,3 +1,8 @@
+2015-06-16 Nils Blattner <nb@cabag.ch>
+	* version 0.1.0
+	* [FEATURE] changed it so the show_item.php script also shows legacy sys_refindex
+	* [TASK] cleaned up PHDoc for several classes
+
 2015-06-15 Nils Blattner <nb@cabag.ch>
 	* version 0.0.9
 	* [FEATURE] fixed core issue, where sys_refindex contains the full path instead of a reference to sys_file uid

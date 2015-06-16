@@ -17,9 +17,9 @@ namespace Cabag\Falsearch\Xclass;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Class for rendering of File>Filelist
+ * XClass for filelist
  *
- * @author Kasper Skårhøj <kasperYYYY@typo3.com>
+ * @author Nils Blattner <nb@cabag.ch>
  */
 class FileList extends \TYPO3\CMS\Filelist\FileList {
 

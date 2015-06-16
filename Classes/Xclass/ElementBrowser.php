@@ -18,9 +18,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Backend\Utility\IconUtility;
 
 /**
- * Class for rendering of File>Filelist
+ * XClass for rendering of the search form.
  *
- * @author Kasper Skårhøj <kasperYYYY@typo3.com>
+ * @author Nils Blattner <nb@cabag.ch>
  */
 class ElementBrowser extends \TYPO3\CMS\Recordlist\Browser\ElementBrowser {
 
