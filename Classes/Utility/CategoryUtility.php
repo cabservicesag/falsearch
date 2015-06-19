@@ -44,6 +44,9 @@ class CategoryUtility implements \TYPO3\CMS\Core\SingletonInterface {
 	 */
 	public function getCategorySelect(array $attributes = array(), $selected = 0) {
 		$tree = $this->getCategoryTree();
+		if (count($tree) === 0) {
+			return '';
+		}
 		
 		$content = '<select';
 		if (count($attributes) > 0) {

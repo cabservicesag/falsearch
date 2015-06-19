@@ -1,3 +1,7 @@
+2015-06-19 Nils Blattner <nb@cabag.ch>
+	* version 0.1.2
+	* [BUG] changed it so that no select is displayed when no categories are present
+
 2015-06-16 Nils Blattner <nb@cabag.ch>
 	* version 0.1.1
 	* [FEATURE] changed it so that the folders are not displayed in the filelist module when searching
