@@ -66,7 +66,7 @@ class ElementInformationController extends \TYPO3\CMS\Backend\Controller\Content
 		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			'*',
 			'sys_refindex',
-			'((ref_table=\'sys_file\' AND ref_uid = ' . (int)$ref->getUid() . ') OR ref_table = \'_FILE\' AND ref_string = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr(rawurldecode($ref->getPublicURL()), 'sys_refindex') . ') AND deleted=0'
+			'((ref_table=\'sys_file\' AND ref_uid = ' . (int)$ref->getUid() . ') OR ref_table = \'_FILE\' AND ref_string = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr(rawurldecode($ref->getPublicURL()), 'sys_refindex') . ') AND deleted=0', 'recuid, ref_uid'
 		);
 		/* MODIFIED nb@cabag.ch end */
 

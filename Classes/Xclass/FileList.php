@@ -83,7 +83,7 @@ class FileList extends \TYPO3\CMS\Filelist\FileList {
 		}
 		// Look up the file in the sys_refindex.
 		// Exclude sys_file_metadata records as these are no use references
-		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('DISTINCT *', 'sys_refindex', '((ref_table=\'sys_file\' AND ref_uid = ' . (int)$fileOrFolderObject->getUid() . ') OR ref_table = \'_FILE\' AND ref_string = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr(rawurldecode($fileOrFolderObject->getPublicURL()), 'sys_refindex') . ') AND deleted=0 AND tablename != "sys_file_metadata"');
+		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('DISTINCT *', 'sys_refindex', '((ref_table=\'sys_file\' AND ref_uid = ' . (int)$fileOrFolderObject->getUid() . ') OR ref_table = \'_FILE\' AND ref_string = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr(rawurldecode($fileOrFolderObject->getPublicURL()), 'sys_refindex') . ') AND deleted=0 AND tablename != "sys_file_metadata"', 'ref_uid, recuid');
 		return $this->generateReferenceToolTip($rows, '\'_FILE\', ' . GeneralUtility::quoteJSvalue($fileOrFolderObject->getCombinedIdentifier()));
 	}
 
