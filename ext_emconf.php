@@ -14,13 +14,13 @@ $EM_CONF[$_EXTKEY] = array (
 	'title' => 'CAB FAL search',
 	'description' => 'Adds a file search box that allows the user to search through the files/folders recursively.',
 	'category' => 'be',
-	'version' => '0.1.3',
+	'version' => '0.1.4',
 	'state' => 'stable',
 	'uploadfolder' => 0,
 	'createDirs' => '',
 	'clearcacheonload' => 1,
-	'author' => 'Nils Blattner',
-	'author_email' => 'nb@cabag.ch',
+	'author' => 'Nils Blattner, Tizian Schmidlin, Lavinia Negru',
+	'author_email' => 'nb@cabag.ch, st@cabag.ch, ln@cabag.ch',
 	'author_company' => '',
 	'constraints' => 
 	array (

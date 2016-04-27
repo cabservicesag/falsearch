@@ -210,4 +210,42 @@ class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 		}
 		return TRUE;
 	}
+	
+	/**
+	 * Returns the full path of this folder, from the root.
+	 *
+	 * This method only overrides the method if TYPO3 is < 6.2.22
+	 *
+	 * @param string $rootId ID of the root folder, NULL to auto-detect
+	 *
+	 * @return string
+	 */
+	public function getReadablePath($rootId = NULL) {
+		if(version_compare(TYPO3_version, '6.2.22', '<')) {
+			if ($rootId === NULL) {
+				// Find first matching filemount and use that as root
+				foreach ($this->storage->getFileMounts() as $fileMount) {
+					if ($this->storage->isWithinFolder($fileMount['folder'], $this)) {
+						$rootId = $fileMount['folder']->getIdentifier();
+						break;
+					}
+				}
+				if ($rootId === null) {
+					$rootId = $this->storage->getRootLevelFolder()->getIdentifier();
+				}
+			}
+			$readablePath = '/';
+			if ($this->identifier !== $rootId) {
+				try {
+					$readablePath = $this->getParentFolder()->getReadablePath($rootId);
+				} catch (Exception\InsufficientFolderAccessPermissionsException $e) {
+					// May no access to parent folder (e.g. because of mount point)
+					$readablePath = '/';
+				}
+			}
+			return $readablePath . $this->name . '/';
+		} else {
+			return parent::getReadablePath($rootId);
+		}
+	}
 }
