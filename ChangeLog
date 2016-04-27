@@ -1,4 +1,6 @@
 2016-04-27 Tizian Schmidlin <st@cabag.ch>
+	* version 0.1.5
+	* fixed namspace problem with Exception\InsufficientFolderAccessPermissionsException
 	* version 0.1.4
 	* [BUGFIX] #73735, Check if folder is within the filemount (Frans Saris), this bugfix will only take effect for TYPO3 < 6.2.22 
 

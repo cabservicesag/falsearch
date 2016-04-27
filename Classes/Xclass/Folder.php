@@ -238,7 +238,7 @@ class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 			if ($this->identifier !== $rootId) {
 				try {
 					$readablePath = $this->getParentFolder()->getReadablePath($rootId);
-				} catch (Exception\InsufficientFolderAccessPermissionsException $e) {
+				} catch (\TYPO3\CMS\Core\Resource\Exception\InsufficientFolderAccessPermissionsException $e) {
 					// May no access to parent folder (e.g. because of mount point)
 					$readablePath = '/';
 				}
