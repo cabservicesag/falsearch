@@ -71,23 +71,6 @@ class FileList extends \TYPO3\CMS\Filelist\FileList {
 	}
 
 	/**
-	 * Make reference count
-	 *
-	 * @param \TYPO3\CMS\Core\Resource\File|\TYPO3\CMS\Core\Resource\Folder $fileOrFolderObject Array with information about the file/directory for which to make the clipboard panel for the listing.
-	 * @return string HTML
-	 * @todo Define visibility
-	 */
-	public function makeRef($fileOrFolderObject) {
-		if ($fileOrFolderObject instanceof \TYPO3\CMS\Core\Resource\FolderInterface) {
-			return '-';
-		}
-		// Look up the file in the sys_refindex.
-		// Exclude sys_file_metadata records as these are no use references
-		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('DISTINCT *', 'sys_refindex', '((ref_table=\'sys_file\' AND ref_uid = ' . (int)$fileOrFolderObject->getUid() . ') OR ref_table = \'_FILE\' AND ref_string = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr(rawurldecode($fileOrFolderObject->getPublicURL()), 'sys_refindex') . ') AND deleted=0 AND tablename != "sys_file_metadata"', 'ref_uid, recuid');
-		return $this->generateReferenceToolTip($rows, '\'_FILE\', ' . GeneralUtility::quoteJSvalue($fileOrFolderObject->getCombinedIdentifier()));
-	}
-
-	/**
 	 * Do not show folders when searching.
 	 *
 	 * @param \TYPO3\CMS\Core\Resource\Folder[] $folders Folders of \TYPO3\CMS\Core\Resource\Folder

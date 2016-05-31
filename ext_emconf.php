@@ -14,7 +14,7 @@ $EM_CONF[$_EXTKEY] = array (
 	'title' => 'CAB FAL search',
 	'description' => 'Adds a file search box that allows the user to search through the files/folders recursively.',
 	'category' => 'be',
-	'version' => '0.1.5',
+	'version' => '0.1.6',
 	'state' => 'stable',
 	'uploadfolder' => 0,
 	'createDirs' => '',
@@ -26,7 +26,7 @@ $EM_CONF[$_EXTKEY] = array (
 	array (
 		'depends' => 
 		array (
-			'typo3' => '6.2.00-6.2.99',
+			'typo3' => '6.2.00-7.6.99',
 		),
 		'conflicts' => 
 		array (

@@ -1,3 +1,8 @@
+2016-05-31 Tizian Schmidlin <st@cabag.ch>
+	* version 0.1.6
+	* fixed issue with FileList that displayed "Array" instead of the reference count
+	* Now compatible with TYPO3 7.6
+
 2016-04-27 Tizian Schmidlin <st@cabag.ch>
 	* version 0.1.5
 	* fixed namspace problem with Exception\InsufficientFolderAccessPermissionsException
