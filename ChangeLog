@@ -1,3 +1,7 @@
+2017-01-20 Tizian Schmidlin <st@cabag.ch>
+	* version 0.2.0
+	* Fixed some incompatible method signatures
+
 2016-05-31 Tizian Schmidlin <st@cabag.ch>
 	* version 0.1.6
 	* fixed issue with FileList that displayed "Array" instead of the reference count
@@ -7,7 +11,7 @@
 	* version 0.1.5
 	* fixed namspace problem with Exception\InsufficientFolderAccessPermissionsException
 	* version 0.1.4
-	* [BUGFIX] #73735, Check if folder is within the filemount (Frans Saris), this bugfix will only take effect for TYPO3 < 6.2.22 
+	* [BUGFIX] #73735, Check if folder is within the filemount (Frans Saris), this bugfix will only take effect for TYPO3 < 6.2.22
 
 2015-06-19 Lavinia Negru <ln@cabag.ch>
 	* version 0.1.3
