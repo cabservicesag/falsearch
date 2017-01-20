@@ -27,13 +27,13 @@ class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 	 * @var boolean
 	 */
 	protected $overrideRecursion = false;
-	
+
 	/**
 	 * The search words.
 	 * @var string
 	 */
 	protected $searchWords = '';
-	
+
 	/**
 	 * The search category.
 	 * @var integer
@@ -104,15 +104,21 @@ class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 	 * @param integer $numberOfItems The number of items to return
 	 * @param integer $filterMode The filter mode to use for the file list.
 	 * @param boolean $recursive
+	 * @param string $sort Property name used to sort the items.
+	 *                     Among them may be: '' (empty, no sorting), name,
+	 *                     fileext, size, tstamp and rw.
+	 *                     If a driver does not support the given property, it
+	 *                     should fall back to "name".
+	 * @param bool $sortRev TRUE to indicate reverse sorting (last to first)
 	 * @return \TYPO3\CMS\Core\Resource\File[]
 	 */
-	public function getFiles($start = 0, $numberOfItems = 0, $filterMode = self::FILTER_MODE_USE_OWN_AND_STORAGE_FILTERS, $recursive = FALSE) {
+	public function getFiles($start = 0, $numberOfItems = 0, $filterMode = self::FILTER_MODE_USE_OWN_AND_STORAGE_FILTERS, $recursive = FALSE, $sort = '', $sortRev = false) {
 		if ($this->overrideRecursion) {
 			$files = array();
-			
+
 			$resourceFactory = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\ResourceFactory');
 			$driver = $resourceFactory->getDriverObject($this->getStorage()->getDriverType(), $this->getStorage()->getConfiguration());
-			
+
 			// Fallback for compatibility with the old method signature variable $useFilters that was used instead of $filterMode
 			if ($filterMode === FALSE) {
 				$useFilters = FALSE;
@@ -124,19 +130,19 @@ class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 					$filters[] = $filter;
 				}
 			}
-			
+
 			$words = $GLOBALS['TYPO3_DB']->fullQuoteArray(array_map(function ($value) { return '%' . $value . '%'; }, GeneralUtility::trimExplode(' ', $this->searchWords, true)), 'sys_file');
 			$wordsMatch = '';
 			if (count($words)) {
 				$wordsMatch = ' AND (sys_file.name LIKE ' . implode(' AND sys_file.name LIKE ', $words) . ')';
 			}
-			
+
 			$categoryUtility = GeneralUtility::makeInstance('Cabag\\Falsearch\\Utility\\CategoryUtility');
 			$categories = array();
 			if ($this->searchCategory > 0) {
 				$categories = array_keys($categoryUtility->getIndexForCategory($this->searchCategory));
 			}
-			
+
 			$resource = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 				'sys_file.*',
 				'sys_file' . (count($categories) > 0 ? ' LEFT JOIN sys_file_metadata ON sys_file_metadata.file = sys_file.uid LEFT JOIN sys_category_record_mm ON sys_file_metadata.uid = sys_category_record_mm.uid_foreign' : ''),
@@ -144,7 +150,7 @@ class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 				(count($categories) > 0 ? 'sys_file.uid' : ''),
 				'sys_file.identifier ASC'
 			);
-			
+
 			$indexer = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Index\\Indexer', $this->getStorage());
 			$count = 0;
 			$resultCount = 0;
@@ -154,13 +160,13 @@ class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 					$badFilters++;
 					continue;
 				}
-				
+
 				if ($start <= $count) {
 					if ($numberOfItems !== 0 && $numberOfItems >= $resultCount) {
 						break;
 					}
 					$file = $resourceFactory->getFileObject($row['uid'], $row);
-					
+
 					// make sure the missing information is up to date
 					try {
 						$indexer->updateIndexEntry($file);
@@ -172,16 +178,16 @@ class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 					if ($file->isMissing()) {
 						continue;
 					}
-					
+
 					$files[] = $file;
 					$resultCount++;
 				}
 				$count++;
 			}
-			
+
 			return $files;
 		}
-		return parent::getFiles($start, $numberOfItems, $filterMode, $recursive);
+		return parent::getFiles($start, $numberOfItems, $filterMode, $recursive, $sort, $sortRev);
 	}
 
 	/**
@@ -210,7 +216,7 @@ class Folder extends \TYPO3\CMS\Core\Resource\Folder {
 		}
 		return TRUE;
 	}
-	
+
 	/**
 	 * Returns the full path of this folder, from the root.
 	 *
