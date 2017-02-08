@@ -32,23 +32,23 @@ class FileList extends \TYPO3\CMS\Filelist\FileList {
 	 */
 	public function getTable($rowlist) {
 		$categoryUtility = GeneralUtility::makeInstance('Cabag\\Falsearch\\Utility\\CategoryUtility');
-		
+
 		$searchCategory = intval(GeneralUtility::_GP('searchCategory'));
-		$searchWord = trim(GeneralUtility::_GP('searchWord'));
-		
+		$searchWord = htmlspecialchars(trim(GeneralUtility::_GP('searchWord')));
+
 		$content .= '<input type="text" name="searchWord" value="' . $searchWord . '" />';
 		$content .= $categoryUtility->getCategorySelect(array('name' => 'searchCategory'), $searchCategory);
 		$content .= '<input type="submit" value="' . $GLOBALS['LANG']->sL('LLL:EXT:falsearch/Resources/Private/Language/locallang.xlf:search') . '" />';
-		
+
 		if (!empty($searchWord) || $searchCategory > 0) {
 			$this->folderObject->setSearchWords($searchWord);
 			$this->folderObject->setSearchCategory($searchCategory);
-			
+
 			$this->folderObject->setOverrideRecursion(true);
 		}
-		
+
 		$content .= parent::getTable($rowlist);
-		
+
 		return $content;
 	}
 
@@ -62,11 +62,11 @@ class FileList extends \TYPO3\CMS\Filelist\FileList {
 	 */
 	public function linkWrapFile($code, \TYPO3\CMS\Core\Resource\File $fileObject) {
 		$code = parent::linkWrapFile($code, $fileObject);
-		
+
 		if ($this->folderObject->getOverrideRecursion()) {
 			$code = htmlspecialchars(rawurldecode(substr($fileObject->getParentFolder()->getPublicUrl(), strlen($this->folderObject->getPublicUrl())))) . $code;
 		}
-		
+
 		return $code;
 	}
 
@@ -81,7 +81,7 @@ class FileList extends \TYPO3\CMS\Filelist\FileList {
 		if ($this->folderObject->getOverrideRecursion()) {
 			return '';
 		}
-		
+
 		return parent::formatDirList($folders);
 	}
 }

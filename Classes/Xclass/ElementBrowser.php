@@ -35,9 +35,9 @@ class ElementBrowser extends \TYPO3\CMS\Recordlist\Browser\ElementBrowser {
 	 */
 	public function TBE_expandFolder(Folder $folder, $extensionList = '', $noThumbs = FALSE) {
 		$content = $this->generateSearchFormAndInitializeFilter($folder);
-		
+
 		$content .= parent::TBE_expandFolder($folder, $extensionList, $noThumbs);
-		
+
 		return $content;
 	}
 
@@ -52,7 +52,7 @@ class ElementBrowser extends \TYPO3\CMS\Recordlist\Browser\ElementBrowser {
 	 */
 	public function expandFolder(Folder $folder, $extensionList = '') {
 		$out = $this->generateSearchFormAndInitializeFilter($folder, false);
-		
+
 		$renderFolders = $this->act === 'folder';
 		if ($folder->checkActionPermission('read')) {
 			// Create header for file listing:
@@ -130,10 +130,10 @@ class ElementBrowser extends \TYPO3\CMS\Recordlist\Browser\ElementBrowser {
 					'</a><br />';
 			}
 		}
-		
+
 		return $out;
 	}
-	
+
 	/**
 	 * Generate the search form and initalize the filters.
 	 *
@@ -143,15 +143,15 @@ class ElementBrowser extends \TYPO3\CMS\Recordlist\Browser\ElementBrowser {
 	protected function generateSearchFormAndInitializeFilter(Folder $folder, $tbe = true) {
 		$categoryUtility = GeneralUtility::makeInstance('Cabag\\Falsearch\\Utility\\CategoryUtility');
 		$searchCategory = intval(GeneralUtility::_GP('searchCategory'));
-		$searchWord = trim(GeneralUtility::_GP('searchWord'));
-		
+		$searchWord = htmlspecialchars(trim(GeneralUtility::_GP('searchWord')));
+
 		$content = '<form action="' . $this->getThisScript() . 'act=' . $this->act . '&mode=' . $this->mode
 			. '&expandFolder=' . rawurlencode($folder->getCombinedIdentifier())
 			. '&bparams=' . rawurlencode($this->bparams) . '" method="post" name="dblistForm">';
 		$content .= '<input type="text" name="searchWord" value="' . $searchWord . '" />';
 		$content .= $categoryUtility->getCategorySelect(array('name' => 'searchCategory'), $searchCategory);
 		$content .= '<input type="submit" value="' . $GLOBALS['LANG']->sL('LLL:EXT:falsearch/Resources/Private/Language/locallang.xlf:search') . '" />';
-		
+
 		if (!$tbe) {
 			$P = GeneralUtility::_GP('P');
 			if (is_array($P)) {
@@ -166,17 +166,17 @@ class ElementBrowser extends \TYPO3\CMS\Recordlist\Browser\ElementBrowser {
 				}
 			}
 		}
-		
+
 		$content .= '<input type="hidden" name="cmd" /></form>';
-		
+
 		if (!empty($searchWord) || $searchCategory > 0) {
 			$folder->setSearchWords($searchWord);
 			$folder->setSearchCategory($searchCategory);
-			
+
 			$folder->setOverrideRecursion(true);
 			$this->filteringRecursive = true;
 		}
-		
+
 		return $content;
 	}
 

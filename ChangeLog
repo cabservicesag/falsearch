@@ -1,3 +1,7 @@
+2017-02-08 Tizian Schmidlin <st@cabag.ch>
+	* version 0.2.1
+	* fixed some possible xss in Xclasses
+
 2017-01-20 Tizian Schmidlin <st@cabag.ch>
 	* version 0.2.0
 	* Fixed some incompatible method signatures

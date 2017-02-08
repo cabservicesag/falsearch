@@ -35,27 +35,27 @@ class BrowseLinks extends \TYPO3\CMS\Rtehtmlarea\BrowseLinks {
 	public function expandFolder(Folder $folder, $extensionList = '') {
 		/* MODIFIED nb@cabag.ch start */
 		$categoryUtility = GeneralUtility::makeInstance('Cabag\\Falsearch\\Utility\\CategoryUtility');
-		
+
 		$searchCategory = intval(GeneralUtility::_GP('searchCategory'));
-		$searchWord = trim(GeneralUtility::_GP('searchWord'));
-		
+		$searchWord = htmlspecialchars(trim(GeneralUtility::_GP('searchWord')));
+
 		$out = '<form action="' . $this->getThisScript() . 'act=' . $this->act . '&mode=' . $this->mode
 			. '&expandFolder=' . rawurlencode($folder->getCombinedIdentifier())
 			. '&bparams=' . rawurlencode($this->bparams) . '" method="post" name="dblistForm">';
 		$out .= '<input type="text" name="searchWord" value="' . $searchWord . '" />';
-		
+
 		$out .= $categoryUtility->getCategorySelect(array('name' => 'searchCategory'), $searchCategory);
 		$out .= '<input type="submit" value="' . $GLOBALS['LANG']->sL('LLL:EXT:falsearch/Resources/Private/Language/locallang.xlf:search') . '" />';
 		$out .= '<input type="hidden" name="cmd" /></form>';
-		
+
 		if (!empty($searchWord) || $searchCategory > 0) {
 			$folder->setSearchWords($searchWord);
 			$folder->setSearchCategory($searchCategory);
-			
+
 			$folder->setOverrideRecursion(true);
 			$this->filteringRecursive = true;
 		}
-		
+
 		/* MODIFIED nb@cabag.ch end */
 		$renderFolders = $this->act === 'folder';
 		if ($folder->checkActionPermission('read')) {
@@ -148,11 +148,11 @@ class BrowseLinks extends \TYPO3\CMS\Rtehtmlarea\BrowseLinks {
 	public function linkWrapFile($code, \TYPO3\CMS\Core\Resource\File $fileObject) {
 		//debug($this->folderObject->getPublicUrl(), $fileObject->getPublicUrl());
 		$code = parent::linkWrapFile($code, $fileObject);
-		
+
 		if ($this->folderObject->getOverrideRecursion()) {
 			$code = substr($fileObject->getParentFolder()->getPublicUrl(), strlen($this->folderObject->getPublicUrl())) . $code;
 		}
-		
+
 		return $code;
 	}
 }
