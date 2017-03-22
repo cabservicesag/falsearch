@@ -1,6 +1,6 @@
 <?php
 
-$extensionClassesPath = t3lib_extMgm::extPath('falsearch') . 'Classes/';
+$extensionClassesPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('falsearch') . 'Classes/';
 return array(
 	'cabag\\falsearch\\xclass\\filelist' => $extensionClassesPath . 'Xclass/FileList.php',
 	'cabag\\falsearch\\xclass\\browselinks' => $extensionClassesPath . 'Xclass/BrowseLinks.php',
